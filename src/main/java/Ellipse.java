@@ -3,8 +3,8 @@ import java.awt.*;
 public class Ellipse extends Shape {
     public Ellipse() {}  // Constructor sin argumentos para Gson
 
-    public Ellipse(int x, int y, int width, int height, Color color) {
-        super(x, y, width, height, color);
+    public Ellipse(int x, int y, int width, int height, Color color, String figureType, String areaType) {
+        super(x, y, width, height, color, figureType, areaType);
     }
 
     @Override

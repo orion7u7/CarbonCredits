@@ -1,7 +1,6 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +11,7 @@ public class MainWindow extends JFrame {
     private JComboBox<ShapeType> shapeComboBox;
     private JComboBox<AreaType> areaTypeComboBox;
     private ColorSelector colorSelector;
-    private JButton loadButton, saveButton, calculateButton;
+    private JButton loadButton, saveButton, calculateButton, clearButton, loadShapesButton;
     private JTextField areaTextField;
 
     public enum AreaType {
@@ -45,6 +44,8 @@ public class MainWindow extends JFrame {
         loadButton = new JButton("Load Image");
         saveButton = new JButton("Save Shapes");
         calculateButton = new JButton("Calculate Area");
+        clearButton = new JButton("Clear Shapes");
+        loadShapesButton = new JButton("Load Shapes");
         areaTextField = new JTextField(10);
         areaTextField.setEditable(false);
 
@@ -66,6 +67,8 @@ public class MainWindow extends JFrame {
         controlPanel.add(loadButton);
         controlPanel.add(saveButton);
         controlPanel.add(calculateButton);
+        controlPanel.add(clearButton);
+        controlPanel.add(loadShapesButton);
         controlPanel.add(new JLabel("Native Forest Area:"));
         controlPanel.add(areaTextField);
 
@@ -75,6 +78,8 @@ public class MainWindow extends JFrame {
         loadButton.addActionListener(e -> loadImage());
         saveButton.addActionListener(e -> saveShapes());
         calculateButton.addActionListener(e -> calculateArea());
+        clearButton.addActionListener(e -> clearShapes());
+        loadShapesButton.addActionListener(e -> loadShapes());
         shapeComboBox.addActionListener(e -> imagePanel.setCurrentShapeType((ShapeType) shapeComboBox.getSelectedItem()));
         areaTypeComboBox.addActionListener(e -> imagePanel.setCurrentAreaType((AreaType) areaTypeComboBox.getSelectedItem()));
         colorSelector.addActionListener(e -> imagePanel.setCurrentColor(colorSelector.getSelectedColor()));
@@ -82,6 +87,10 @@ public class MainWindow extends JFrame {
         // Finalización de la configuración
         pack();
         setVisible(true);
+    }
+
+    private void clearShapes() {
+        imagePanel.clearShapes();
     }
 
     // Métodos para manejar acciones de botones
@@ -111,8 +120,30 @@ public class MainWindow extends JFrame {
             if (!selectedFile.getName().toLowerCase().endsWith(".json")) {
                 selectedFile = new File(selectedFile.getAbsolutePath() + ".json");
             }
-            FileHandler.saveShapes((List<Shape>)imagePanel.getAllShapes(), selectedFile.getAbsolutePath());
+            FileHandler.saveShapes(imagePanel.getAllShapes(), selectedFile.getAbsolutePath());
             JOptionPane.showMessageDialog(this, "Shapes saved successfully!");
+        }
+    }
+
+    private void loadShapes() {
+        JFileChooser fileChooser = new JFileChooser();
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            List<Shape> loadedShapes = FileHandler.loadShapes(selectedFile.getAbsolutePath());
+            if (loadedShapes == null) {
+                JOptionPane.showMessageDialog(this, "Error loading shapes", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                imagePanel.clearShapes();
+                for (Shape shape : loadedShapes) {
+                    if (shape.getAreaType().equals("Total Area")) {
+                        imagePanel.setShapeForAreaType(AreaType.TOTAL_AREA, shape);
+                    } else {
+                        imagePanel.setShapeForAreaType(AreaType.FOREST_AREA, shape);
+                    }
+                }
+            }
+            imagePanel.repaint();
         }
     }
 

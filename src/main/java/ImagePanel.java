@@ -49,17 +49,17 @@ public class ImagePanel extends JPanel {
 
         switch (currentShapeType) {
             case Rectangle:
-                return new Rectangle(x, y, width, height, currentColor);
+                return new Rectangle(x, y, width, height, currentColor, "Rectangle", currentAreaType.toString());
             case Square:
                 int size = Math.min(width, height);
-                return new Square(x, y, size, currentColor);
+                return new Square(x, y, size, currentColor, "Square", currentAreaType.toString());
             case Ellipse:
-                return new Ellipse(x, y, width, height, currentColor);
+                return new Ellipse(x, y, width, height, currentColor, "Ellipse", currentAreaType.toString());
             case Circle:
                 int radius = Math.min(width, height) / 2;
-                return new Circle(x + radius, y + radius, radius, currentColor);
+                return new Circle(x + radius, y + radius, radius, currentColor, "Circle", currentAreaType.toString());
             default:
-                return new Rectangle(x, y, width, height, currentColor);
+                return new Rectangle(x, y, width, height, currentColor, "Rectangle", currentAreaType.toString());
         }
     }
 
@@ -86,6 +86,11 @@ public class ImagePanel extends JPanel {
         image = img;
         setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));
         revalidate();
+        repaint();
+    }
+
+    public void clearShapes() {
+        shapes.clear();
         repaint();
     }
 

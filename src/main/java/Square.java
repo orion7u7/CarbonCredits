@@ -3,8 +3,8 @@ import java.awt.*;
 public class Square extends Shape {
     public Square() {}  // Constructor sin argumentos para Gson
 
-    public Square(int x, int y, int size, Color color) {
-        super(x, y, size, size, color);
+    public Square(int x, int y, int size, Color color, String figureType, String areaType) {
+        super(x, y, size, size, color, figureType, areaType);
     }
 
     @Override

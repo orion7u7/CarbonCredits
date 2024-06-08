@@ -3,8 +3,8 @@ import java.awt.*;
 public class Rectangle extends Shape {
     public Rectangle() {}  // Constructor sin argumentos para Gson
 
-    public Rectangle(int x, int y, int width, int height, Color color) {
-        super(x, y, width, height, color);
+    public Rectangle(int x, int y, int width, int height, Color color, String figureType, String areaType) {
+        super(x, y, width, height, color, figureType, areaType);
     }
 
     @Override
