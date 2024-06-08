@@ -27,6 +27,9 @@ public class MainWindow extends JFrame {
 
 
         // Add action listeners to buttons
+        loadButton.addActionListener(e -> loadImage());
+        saveButton.addActionListener(e -> saveShapes());
+        calculateButton.addActionListener(e -> calculateArea());
 
     }
 
