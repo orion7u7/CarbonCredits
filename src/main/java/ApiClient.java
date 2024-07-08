@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -6,6 +7,8 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import com.google.gson.Gson;
 import java.util.List;
+
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 public class ApiClient {
@@ -14,10 +17,14 @@ public class ApiClient {
             .version(HttpClient.Version.HTTP_2)
             .connectTimeout(Duration.ofSeconds(10))
             .build();
-    private static final Gson gson = new Gson();
-
+    private static final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(Color.class, new ColorAdapter())
+            .registerTypeAdapter(Shape.class, new ShapeAdapter())
+            .create();
     public static String sendEvaluation(Long areaId, List<Shape> shapes) throws Exception {
-        String url = API_BASE_URL + "/evaluaciones";
+
+        String url = API_BASE_URL + "/evaluaciones?areaId=" + areaId;
+
 
         EvaluationData evaluationData = new EvaluationData(areaId, shapes);
         String jsonBody = gson.toJson(evaluationData);
@@ -80,4 +87,5 @@ public class ApiClient {
             this.shapes = shapes;
         }
     }
+
 }

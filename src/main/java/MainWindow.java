@@ -36,7 +36,7 @@ public class MainWindow extends JFrame {
         // Configuración inicial
         setTitle("Carbon Credits Evaluator");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setPreferredSize(new Dimension(1200, 800));
+        setPreferredSize(new Dimension(1366, 768));
         setLocationRelativeTo(null);
 
         // Inicialización de componentes
@@ -61,8 +61,8 @@ public class MainWindow extends JFrame {
         JScrollPane scrollPane = new JScrollPane(imagePanel);
         add(scrollPane, BorderLayout.CENTER);
 
-        JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
-        controlPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 1, 1));
+        controlPanel.setBorder(BorderFactory.createEmptyBorder(1, 5, 50, 1));
 
         controlPanel.add(new JLabel("Area Type:"));
         controlPanel.add(areaTypeComboBox);
@@ -83,6 +83,8 @@ public class MainWindow extends JFrame {
         controlPanel.add(new JLabel("Select Area:"));
         controlPanel.add(areaComboBox);
         controlPanel.add(loadAreaButton);
+
+
 
         add(controlPanel, BorderLayout.SOUTH);
 

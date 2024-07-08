@@ -19,6 +19,7 @@ public abstract class Shape {
         this.areaType = areaType;
     }
 
+
     public abstract void draw(Graphics2D g2d);
 
     public abstract void drawPreview(Graphics2D g2d);
