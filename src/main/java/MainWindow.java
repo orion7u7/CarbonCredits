@@ -13,7 +13,10 @@ public class MainWindow extends JFrame {
     private ColorSelector colorSelector;
     private JButton loadButton, saveButton, calculateButton, clearButton, loadShapesButton;
     private JTextField areaTextField;
-
+    private JTextField areaIdTextField;
+    private JButton sendEvaluationButton;
+    private JComboBox<AreaEvaluada> areaComboBox;
+    private JButton loadAreaButton;
     public enum AreaType {
         TOTAL_AREA("Total Area"), FOREST_AREA("Forest Area");
 
@@ -48,7 +51,10 @@ public class MainWindow extends JFrame {
         loadShapesButton = new JButton("Load Shapes");
         areaTextField = new JTextField(10);
         areaTextField.setEditable(false);
-
+        areaIdTextField = new JTextField(10);
+        sendEvaluationButton = new JButton("Send Evaluation");
+        areaComboBox = new JComboBox<>();
+        loadAreaButton = new JButton("Load Area");
         // Configuración de layout y adición de componentes
         setLayout(new BorderLayout(10, 10));
 
@@ -71,6 +77,12 @@ public class MainWindow extends JFrame {
         controlPanel.add(loadShapesButton);
         controlPanel.add(new JLabel("Native Forest Area:"));
         controlPanel.add(areaTextField);
+        controlPanel.add(new JLabel("Area ID:"));
+        controlPanel.add(areaIdTextField);
+        controlPanel.add(sendEvaluationButton);
+        controlPanel.add(new JLabel("Select Area:"));
+        controlPanel.add(areaComboBox);
+        controlPanel.add(loadAreaButton);
 
         add(controlPanel, BorderLayout.SOUTH);
 
@@ -83,6 +95,8 @@ public class MainWindow extends JFrame {
         shapeComboBox.addActionListener(e -> imagePanel.setCurrentShapeType((ShapeType) shapeComboBox.getSelectedItem()));
         areaTypeComboBox.addActionListener(e -> imagePanel.setCurrentAreaType((AreaType) areaTypeComboBox.getSelectedItem()));
         colorSelector.addActionListener(e -> imagePanel.setCurrentColor(colorSelector.getSelectedColor()));
+        sendEvaluationButton.addActionListener(e -> sendEvaluation());
+        loadAreaButton.addActionListener(e -> loadSelectedArea());
 
         // Finalización de la configuración
         pack();
@@ -159,6 +173,71 @@ public class MainWindow extends JFrame {
         double percentage = (forestArea.getArea() / totalArea.getArea()) * 100;
         areaTextField.setText(String.format("%.2f%%", percentage));
     }
+    private void sendEvaluation() {
+        try {
+            Long areaId = Long.parseLong(areaIdTextField.getText());
+            List<Shape> shapes = imagePanel.getAllShapes();
+
+            String response = ApiClient.sendEvaluation(areaId, shapes);
+            JOptionPane.showMessageDialog(this, "Evaluation sent successfully! Response: " + response);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Invalid Area ID. Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error sending evaluation: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    private void loadAreasEvaluadas() {
+        try {
+            List<AreaEvaluada> areas = ApiClient.getAreasEvaluadas();
+            areaComboBox.removeAllItems();
+            for (AreaEvaluada area : areas) {
+                areaComboBox.addItem(area);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading areas: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    private void loadSelectedArea() {
+        AreaEvaluada selectedArea = (AreaEvaluada) areaComboBox.getSelectedItem();
+        if (selectedArea == null) {
+            JOptionPane.showMessageDialog(this, "Please select an area first.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            AreaEvaluada fullArea = ApiClient.getAreaById(selectedArea.getId());
+            updateUIWithAreaData(fullArea);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading area: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    private void updateUIWithAreaData(AreaEvaluada area) {
+        // Actualizar los campos de la UI con los datos del área
+        areaIdTextField.setText(String.valueOf(area.getId()));
+
+        // Actualizar las formas en el imagePanel
+        imagePanel.clearShapes();
+        if (area.getAreaTotal() > 0) {
+            Shape totalAreaShape = createShapeFromArea(area.getAreaTotal(), Color.RED);
+            imagePanel.setShapeForAreaType(AreaType.TOTAL_AREA, totalAreaShape);
+        }
+        if (area.getAreaBosqueNativo() > 0) {
+            Shape forestAreaShape = createShapeFromArea(area.getAreaBosqueNativo(), Color.GREEN);
+            imagePanel.setShapeForAreaType(AreaType.FOREST_AREA, forestAreaShape);
+        }
+        imagePanel.repaint();
+
+        // Actualizar otros campos según sea necesario
+        // Por ejemplo:
+        // propietarioTextField.setText(area.getPropietario().getNombre());
+        // evaluadorTextField.setText(area.getEvaluador().getNombre());
+    }
+    private Shape createShapeFromArea(double area, Color color) {
+        // Crear una forma cuadrada basada en el área
+        int side = (int) Math.sqrt(area);
+        return new Rectangle(0, 0, side, side, color, "Rectangle", "");
+    }
+
 
 
     // Método principal
